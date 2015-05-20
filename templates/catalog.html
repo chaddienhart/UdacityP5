@@ -1,0 +1,16 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+</head>
+
+<body class=pane>
+
+<h1 class=header>Categories</h1>
+{% for c in categories %}
+<div>
+    <h3><a href="{{url_for('items', category_name=c.name)}}">{{c.name}}</a></h3>
+</div>
+{% endfor %}
+</body>
+
+</html>

@@ -14,12 +14,13 @@
     <!-- Bootstrap core CSS -->
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-theme.min.css')}}">
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
 
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
  </head>
 
   <body>
-    <div class="navbar navbar-fixed-top">
+   <div class="navbar navbar-fixed-top">
         <div class="navbar-header">
           <a class="navbar-brand" href="{{url_for('catalog')}}">
                        <img class="img-responsive" style="max-width:100px;"
@@ -37,28 +38,18 @@
            {% endif %}
         </div>
     </div>
-
-    <div class="container">
-
-          {% for c in range(0, categories.count()) %}
-          <div class="row">
-              <div class="col-md-4 text-left">
-              <h3><a href="{{url_for('viewCategory', category_id=categories[c].id, user_id=user.id)}}">{{categories[c].name}}</a></h3>
-              </div>
-              {% if items.count() > c %}
-                <div class="col-md-8 name text-right">
-                <h3><a href="{{url_for('viewItem', user_id=user.id, item_id=items[c].id)}}">{{items[c].name}}</h3>
-                </div>
-              {% endif %}
-          </div>
-          {% endfor %}
-
+  <div class="container">
+        <h1 class=header>{{category.name}}</h1>
+      {% if user.id %}
+      <H2><a href="{{ url_for('newItem', user_id=user.id) }}">Add new item</a> </H2>
+      {% endif %}
+        {% for i in items %}
+        <div>
+            <h3><a href="{{ url_for('viewItem',  user_id=user.id, item_id=i.id) }}">{{i.name}}</a></h3>
+        </div>
+        {% endfor %}
     </div><!-- /.container -->
 
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
-
-</body></html>
+</body>
+</html>

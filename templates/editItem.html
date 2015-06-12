@@ -1,0 +1,32 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+</head>
+
+<body class=pane>
+
+<h1>Edit Menu Item</h1>
+
+<div class = 'pane'>
+<form action="{{ url_for('editItem', user_id=user_id, item_id=item.id )}}" method = 'post'>
+
+<dl>
+	<dt>Category:</dt>
+		<dd><input type ='text' size='30' name='category' value="{{item_category_name}}" readonly></dd>
+	<dt>Name:</dt>
+		<dd><input type ='text' pattern="[a-zA-Z0-9. -]+" size='30' name='name' value="{{item.name}}"></dd>
+	<dt>Description:</dt>
+		<dd><textarea pattern="[a-zA-Z0-9. -]+" name='description' cols="40" rows="6">{{item.description}}</textarea></dd>
+	<dt>Picture:</dt>
+		<dd><input type ='url' name='imageUrl'></dd>
+</dl>
+
+
+<input type='submit' name="button" value='Update'>
+<input type='submit' name="button" value='Cancel'>
+
+</form>
+</div>
+</body>
+
+</html>

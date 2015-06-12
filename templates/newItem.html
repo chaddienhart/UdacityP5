@@ -1,0 +1,40 @@
+<html>
+<head>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+</head>
+
+<body class=pane>
+
+<h1>New Item</h1>
+
+<div class = 'pane'>
+<form action="{{ url_for('newItem', user_id=user_id )}}" method = 'post'>
+
+<dl>
+	<dt>Category:
+        <select>
+            {% for c in categories %}
+                <option value="{{c.name}}">{{c.name}}</option>
+            {% endfor %}
+        </select>
+    </dt><br>
+	<dt>Name:
+		<input type ='text'  pattern="[a-zA-Z0-9. -]+" size='30' name='name'>
+    </dt>
+    <br>
+	<dt>Description:</dt>
+		<dd><textarea  pattern="[a-zA-Z0-9. -]+" name='description' cols="40" rows="6"></textarea></dd>
+	<br>
+    <dt>Picture:</dt>
+		<dd><input type ='url' name='imageUrl'></dd>
+</dl>
+
+
+<input type='submit' name="button" value='Create'>
+<input type='submit' name="button" value='Cancel'>
+
+</form>
+</div>
+</body>
+
+</html>

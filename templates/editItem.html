@@ -8,11 +8,16 @@
 <h1>Edit Menu Item</h1>
 
 <div class = 'pane'>
-<form action="{{ url_for('editItem', user_id=user_id, item_id=item.id )}}" method = 'post'>
+<form action="{{ url_for('editItem', item_id=item.id )}}" method = 'post'>
 
 <dl>
-	<dt>Category:</dt>
-		<dd><input type ='text' size='30' name='category' value="{{item_category_name}}" readonly></dd>
+	<dt>Category:
+        <select name="category">
+            {% for c in categories %}
+                <option value="{{c.name}}">{{c.name}}</option>
+            {% endfor %}
+        </select>
+    </dt><br>
 	<dt>Name:</dt>
 		<dd><input type ='text' pattern="[a-zA-Z0-9. -]+" size='30' name='name' value="{{item.name}}"></dd>
 	<dt>Description:</dt>

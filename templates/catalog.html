@@ -20,41 +20,57 @@
 
   <body>
     <div class="navbar navbar-fixed-top">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="{{url_for('catalog')}}">
-                       <img class="img-responsive" style="max-width:100px;"
-                       src="{{ url_for('static', filename = 'homeIcon.jpg') }}"
-                       alt="Home" height="50" width="50"></a>
-            {% if user.id %}
-               <H3 class="headerWelcome">Welcome: {{user.name}}</H3>
-            {% endif %}
-         </div>
-        <div class="navbar-header pull-right">
-            {% if user.id %}
-            <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('catalog')}}">Sign out</a></H2>
-            {% else %}
-            <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('login')}}">Sign in</a></H2>
-           {% endif %}
+        <div class="container">
+            <div class="navbar-header">
+                <ul class="nav navbar-nav">
+                    <li><a class="navbar-brand" href="{{url_for('catalog')}}">
+                        <img class="img-responsive" style="max-width:100px;"
+                            src="{{ url_for('static', filename = 'homeIcon.jpg') }}"
+                            alt="Home" height="50" width="50"></a></li>
+                    {% if user != None %}
+                    <li>
+                        <span class="headerWelcome text-center v-center">Welcome: {{user.name}}</span>
+                        <span><img src="{{user.picture}}" style = "width: 32px; height: 32px;border-radius: 16px;-webkit-border-radius: 16px;-moz-border-radius: 16px;"></span>
+
+                    </li>
+                    {% endif %}
+                    <li style="padding-left: 100px;">
+                        {% if user != None %}
+                        <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('logout')}}">Sign out</a></H2>
+                        {% else %}
+                        <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('login')}}">Sign in</a></H2>
+                       {% endif %}
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
+    <hr>
 
     <div class="container">
-
-          {% for c in range(0, categories.count()) %}
-          <div class="row">
-              <div class="col-md-4 text-left">
-              <h3><a href="{{url_for('viewCategory', category_id=categories[c].id, user_id=user.id)}}">{{categories[c].name}}</a></h3>
-              </div>
-              {% if items.count() > c %}
-                <div class="col-md-8 name text-right">
-                <h3><a href="{{url_for('viewItem', user_id=user.id, item_id=items[c].id)}}">{{items[c].name}}</h3>
-                </div>
-              {% endif %}
+  	<div class="row">
+        <div class="col-md-6 col-sm-6">
+          <div class="panel panel-default">
+            <div class="panel-heading panel-heading-custom text-center"><h3>Categories</h3></div>
+            <div class="panel-body">
+                {% for c in range(0, categories.count()) %}
+                <h3 class="text-center"><a href="{{url_for('viewCategory', category_id=categories[c].id)}}">{{categories[c].name}}</a></h3>
+                {% endfor %}
+            </div>
           </div>
-          {% endfor %}
-
-    </div><!-- /.container -->
-
+      	</div>
+        <div class="col-md-6 col-sm-6">
+          <div class="panel panel-default">
+            <div class="panel-heading panel-heading-custom text-center"><h3>Recent items</h3></div>
+            <div class="panel-body">
+                {% for c in range(0, items.count()) %}
+                <h3 class="text-center"><a href="{{url_for('viewItem', item_id=items[c].id)}}">{{items[c].name}}</h3>
+                {% endfor %}
+            </div>
+          </div>
+      	</div>
+  	</div>
+    </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

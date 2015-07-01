@@ -8,10 +8,16 @@
 <h1 class=header>{{item.name}}</h1>
 <div>
     <p>{{item.description}}</p>
-    <H2><a href="{{url_for('editItem', user_id=user_id, item_id=item.id)}}">Edit</a> </H2>
-    <H2><a href="{{url_for('deleteItem', user_id=user_id, item_id=item.id, item_name=item.name)}}">Delete</a> </H2>
+    {% if user != None and user.id == item.user_id %}
+        <H2><a href="{{url_for('editItem', item_id=item.id)}}">Edit</a> </H2>
+        <H2><a href="{{url_for('deleteItem', item_id=item.id)}}">Delete</a> </H2>
+    {% endif %}
 </div>
-<!-- need a way to get back to the category and back to home... -->
+
+<!-- need a way to get back to the category and back to category view... -->
+<div>
+    <a href="{{url_for('viewCategory', category_id=item.category_id)}}">Back to Category</a>
+</div>
 </body>
 
 </html>

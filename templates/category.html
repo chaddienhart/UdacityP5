@@ -26,13 +26,13 @@
                        <img class="img-responsive" style="max-width:100px;"
                        src="{{ url_for('static', filename = 'homeIcon.jpg') }}"
                        alt="Home" height="50" width="50"></a>
-            {% if user.id %}
+            {% if user != None %}
                <H3 class="headerWelcome">Welcome: {{user.name}}</H3>
             {% endif %}
          </div>
         <div class="navbar-header pull-right">
-            {% if user.id %}
-            <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('catalog')}}">Sign out</a></H2>
+            {% if user != None %}
+            <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('gdisconnect')}}">Sign out</a></H2>
             {% else %}
             <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('login')}}">Sign in</a></H2>
            {% endif %}
@@ -40,12 +40,10 @@
     </div>
   <div class="container">
         <h1 class=header>{{category.name}}</h1>
-      {% if user.id %}
-      <H2><a href="{{ url_for('newItem', user_id=user.id) }}">Add new item</a> </H2>
-      {% endif %}
+        <H2><a href="{{ url_for('newItem') }}">Add new item</a> </H2>
         {% for i in items %}
         <div>
-            <h3><a href="{{ url_for('viewItem',  user_id=user.id, item_id=i.id) }}">{{i.name}}</a></h3>
+            <h3><a href="{{ url_for('viewItem', item_id=i.id) }}">{{i.name}}</a></h3>
         </div>
         {% endfor %}
     </div><!-- /.container -->

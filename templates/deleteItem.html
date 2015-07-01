@@ -5,12 +5,16 @@
 
 <body>
 <div>
-<form action="{{ url_for('deleteItem', user_id=user_id, item_id=item_id, item_name=item_name )}}" method = 'post'>
-<dl>
-	<dt>Are you sure you want to delete {{item_name}}?:</dt>
-</dl>
-    <input type='submit' value='Yes' name="button">
-    <input type='submit' value='No' name="button">
+<form action="{{ url_for('deleteItem', item_id=item.id, csrf=csrf) }}" method = 'post'>
+    {% if user != None and item != None and user.id == item.user_id %}
+	    <div><H2>Are you sure you want to delete {{item.name}}?:</H2></div>
+        <input type='submit' value='Yes' name="button">
+        <input type='submit' value='No' name="button">
+    {% else %}
+        <!-- this is in case a user tries to navigate directly to the delete url -->
+	    <div><H2>You are not the owner of {{item.name}} and cannot delete it.</H2></div>
+        <input type='submit' value='Ok' name="button">
+    {% endif %}
 </form>
 </div>
 

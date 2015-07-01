@@ -11,11 +11,11 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
 
-    name =Column(String(80), nullable = False)
-    id = Column(Integer, primary_key = True)
-    email = Column(String(250),  primary_key = True)
+    name = Column(String(80), nullable=False)
+    id = Column(Integer, primary_key=True)
+    email = Column(String(250),  unique=True)
     picture = Column(String(250))
-
+    __table_args__ = {'sqlite_autoincrement': True}
     @property
     def serialize(self):
         return {
@@ -56,17 +56,14 @@ class Item(Base):
         return {
             'name' : self.name,
             'description' : self.description,
+            'added by' : self.user_id,
+            'category' : self.category_id,
             'id' : self.id,
             'picture' : self.picture,
-            'added by' : self.user_id,
-            'date added' : self.date_added
+            #'date added' : self.date_added
         }
-        
-
-
 
 engine = create_engine('sqlite:///itemcatalog.db')
- 
 
 Base.metadata.create_all(engine)
 

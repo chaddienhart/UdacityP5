@@ -1,51 +1,14 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)http://getbootstrap.com/examples/starter-template/ -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
-
+<html lang="en">
+<head>
+    {% include 'bootstrap_head.html' %}
     <title>Item Catalog</title>
-
-    <!-- Bootstrap core CSS -->
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-theme.min.css')}}">
-
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
- </head>
+</head>
 
   <body>
-    <div class="navbar navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <ul class="nav navbar-nav">
-                    <li><a class="navbar-brand" href="{{url_for('catalog')}}">
-                        <img class="img-responsive" style="max-width:100px;"
-                            src="{{ url_for('static', filename = 'homeIcon.jpg') }}"
-                            alt="Home" height="50" width="50"></a></li>
-                    {% if user != None %}
-                    <li>
-                        <span class="headerWelcome text-center v-center">Welcome: {{user.name}}</span>
-                        <span><img src="{{user.picture}}" style = "width: 32px; height: 32px;border-radius: 16px;-webkit-border-radius: 16px;-moz-border-radius: 16px;"></span>
 
-                    </li>
-                    {% endif %}
-                    <li style="padding-left: 100px;">
-                        {% if user != None %}
-                        <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('logout')}}">Sign out</a></H2>
-                        {% else %}
-                        <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('login')}}">Sign in</a></H2>
-                       {% endif %}
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <hr>
+  {% include 'bootstrap_body.html' %}
 
     <div class="container">
   	<div class="row">
@@ -71,10 +34,5 @@
       	</div>
   	</div>
     </div>
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
 
 </body></html>

@@ -18,8 +18,16 @@ import json
 from flask import make_response
 import requests
 
-#for ghublogin
-#from requests_oauthlib import OAuth2Session
+# import cloudinary
+# import cloudinary.uploader
+# import cloudinary.api
+#
+# cloudinary.config(
+#   cloud_name = "hi",
+#   api_key = "274286359535494",
+#   api_secret = "ILYp3Gy3VgjvlrLV8z55CZ-Rt10"
+# )
+
 
 CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
 
@@ -81,7 +89,8 @@ def newItem():
     if request.method == 'POST':
         category_name = request.form['category']
         category = db_session.query(Category).filter_by(name=category_name).one()
-        newlocalitem = Item(name=request.form['name'], description=request.form['description'], categories=category, users=user)
+        newlocalitem = Item(name=request.form['name'], description=request.form['description'],
+                            picture=request.form['imageUrl'], categories=category, users=user)
         db_session.add(newlocalitem)
         db_session.commit()
         flash(newlocalitem.id) #flash the id so that we can look up the item and tag it as new
@@ -90,18 +99,19 @@ def newItem():
         if user is None:
             return redirect(url_for('login'))
         categories = db_session.query(Category).group_by(Category.name).distinct()
-        return render_template('newItem.html', categories=categories)
+        return render_template('newItem.html', categories=categories, user=user)
 
-
+'''
+Deleting an item can only be performed by the owner, if not the user return to the item view
+Verify that the user wants to delete the item and protect against CSRF by creating a unique token
+when verifying and checking that the token matches on the POST request
+'''
 @app.route('/catalog/deleteItem/<int:item_id>/', methods=['GET', 'POST'])
 def deleteItem(item_id):
     user = getCurrentUser()
     item = db_session.query(Item).filter(Item.id == item_id).one()
-    # prevent non item owner from deleting the item
+    # prevent non item owner from deleting the item, redirect anyone else
     if user is not None and item.user_id != user.id:
-        # response = make_response(json.dumps('invalid state parameter'), 401)
-        # response.headers['Content-Type'] = 'application/json'
-        # return response
         return redirect(url_for('viewItem', item_id=item_id))
 
     if request.method == 'POST':
@@ -122,29 +132,23 @@ def deleteItem(item_id):
     else:
         csrf = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
         login_session['csrf'] = csrf
-        #print item.name
         return render_template('deleteItem.html', item=item, user=user, csrf=csrf)
 
 
 @app.route('/catalog/editItem/<int:item_id>/', methods=['GET', 'POST'])
 def editItem(item_id):
     updated_item = db_session.query(Item).filter_by(id=item_id).one()
+    user = getCurrentUser()
     if request.method == 'POST':
         if request.form['button'] == 'Update':
-            print updated_item.name
             updated_item.name = request.form['name']
-            print updated_item.name
             updated_item.description = request.form['description']
             updated_item.picture = request.form['imageUrl']
-            print 'post commit'
             db_session.commit()
         return redirect(url_for('viewItem', item_id=item_id))
     else:
-        print updated_item.name
-        item_category = db_session.query(Category).filter_by(id=updated_item.category_id).one()
         categories = db_session.query(Category).group_by(Category.name).distinct()
-        print item_category
-        return render_template('editItem.html', item=updated_item, categories=categories)
+        return render_template('editItem.html', item=updated_item, categories=categories, user=user)
 
 
 @app.route('/catalog/viewItem/<int:item_id>/')
@@ -158,6 +162,23 @@ def viewItem(item_id):
 def itemJSON(item_id):
     item = db_session.query(Item).filter_by(id = item_id).one()
     return jsonify(Item=item.serialize)
+
+
+@app.route('/catalog/myItems/<int:user_id>')
+def myItems(user_id):
+    user = getCurrentUser()
+    # prevent non item owner from viewing myItems
+    if user is not None and user_id != user.id:
+        # don't give any info if you are not the correct user return to home
+        return redirect(url_for('catalog'))
+    items = db_session.query(Item).filter_by(user_id = user_id).order_by(Item.category_id).all()
+    return render_template('myItems.html', items=items, user=user)
+
+
+@app.route('/catalog/about/')
+def about():
+    user = getCurrentUser()
+    return render_template('about.html', user=user)
 
 
 @app.route('/login/', methods=['GET', 'POST'])

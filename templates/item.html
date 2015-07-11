@@ -1,23 +1,34 @@
-<html>
-<head>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+<!DOCTYPE html>
+<html lang="en">
+    {% include 'bootstrap_head.html' %}
+    <title>Item Catalog</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
 </head>
+<body>
+    {% include 'bootstrap_body.html' %}
+    <div  class="container">
 
-<body class=pane>
-
-<h1 class=header>{{item.name}}</h1>
-<div>
-    <p>{{item.description}}</p>
-    {% if user != None and user.id == item.user_id %}
-        <H2><a href="{{url_for('editItem', item_id=item.id)}}">Edit</a> </H2>
-        <H2><a href="{{url_for('deleteItem', item_id=item.id)}}">Delete</a> </H2>
-    {% endif %}
-</div>
-
-<!-- need a way to get back to the category and back to category view... -->
-<div>
-    <a href="{{url_for('viewCategory', category_id=item.category_id)}}">Back to Category</a>
-</div>
+        <h1 class=header>{{item.name}}</h1>
+        <div>
+            {% if item.picture != None and item.picture != "" %}
+                <img src="{{item.picture}}">
+            {% endif %}
+            <h2>Description:</h2>
+            <p>{{item.description}}</p>
+        </div>
+    </div>
+    <div  class="container">
+        <hr>
+        {% if user != None and user.id == item.user_id %}
+            <h2><a href="{{url_for('editItem', item_id=item.id)}}">Edit</a> </h2>
+            <h2><a href="{{url_for('deleteItem', item_id=item.id)}}">Delete</a> </h2>
+        {% endif %}
+        <!-- need a way to get back to the category and back to category view... -->
+        <div>
+            <br>
+            <h2><a href="{{url_for('viewCategory', category_id=item.category_id)}}">Back to Category</a></h2>
+        </div>
+    </div>
 </body>
 
 </html>

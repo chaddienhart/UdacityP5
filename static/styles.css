@@ -1,4 +1,4 @@
-body { font-family: sans-serif; background-color: #333333; padding-top: 100px; }
+body { font-family: sans-serif; background-color: #333333; }
 .panel, .panel-default { background-color: #333333; background-image: none}
 .panel-default > .panel-heading-custom { background: #777777; color: #777; background-image: none}
 
@@ -13,30 +13,61 @@ img {
 
 p, dd, dt               { color: #CCCCCC;}
 
-a {text-decoration: none; color:#FFFFCC; font-size: .75em;}
+a {text-decoration: none; color:#FFFFCC; font-size: 1em;}
 
 .pane {position:absolute; left: 5%; border: 2px solid;
     border-radius: 25px; padding: 5px; margin: 5px; border-color: #999999; background-color: #333333 }
-.header         {text-align: left;}
+
+.header {
+    text-align: left;
+    }
+
 .name {text-align: right;}
-.description {}
-.price {text-align: right; width:50%; float: right; }
 .editdeletepane{float: center; boarder: 2px solid; border-radius: 10px; border-color: #999999}
 
-.flash          { background: #cee5F5; }
+.headerWelcome {
+    padding-left: 10%;
+    color: #FFFFFF;
+    position: center;
+}
 
-.headerWelcome {padding-left: 10%; color: #FFFFFF;}
+/* additem styling for add item link on Category.html template */
+.additem {
+    border: 2px solid;
+    border-radius: 5px;
+    padding: 1px;
+    border-color: #999999;
+    background-color: #333333
+}
+
+
 .headerBtn {margin-right: 30px;}
 
 .login_container {
-position: center;
+    position: center;
 }
 
+/* github button spacing for octocat */
 .github_button {
-padding: 5px;
-margin: 5px;
-margin: 5px;
-background-color: green;
-white-space: nowrap;
-display:inline-block;
+    padding: 5px;
+    margin: 5px;
+    margin: 5px;
+    background-color: green;
+    white-space: nowrap;
+    display:inline-block;
+}
+
+/* workaround for (https://github.com/twbs/bootstrap/issues/11243) */
+.navbar-collapse.in {
+    overflow-y: visible;
+}
+
+@media screen and (max-width:760px) {
+    .headerWelcome {
+        position: fixed;
+    }
+    /* would like to make this more dynamic, tried for hours... */
+    .navbar-collapse {
+        height: 175px;
+    }
 }

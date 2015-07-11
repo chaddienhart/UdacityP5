@@ -1,23 +1,24 @@
-<html>
-<head>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+<!DOCTYPE html>
+<!-- saved from url=(0050)http://getbootstrap.com/examples/starter-template/ -->
+<html lang="en">
+    {% include 'bootstrap_head.html' %}
+    <title>Item Catalog</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
 </head>
-
 <body>
-<div>
-<form action="{{ url_for('deleteItem', item_id=item.id, csrf=csrf) }}" method = 'post'>
-    {% if user != None and item != None and user.id == item.user_id %}
-	    <div><H2>Are you sure you want to delete {{item.name}}?:</H2></div>
-        <input type='submit' value='Yes' name="button">
-        <input type='submit' value='No' name="button">
-    {% else %}
-        <!-- this is in case a user tries to navigate directly to the delete url -->
-	    <div><H2>You are not the owner of {{item.name}} and cannot delete it.</H2></div>
-        <input type='submit' value='Ok' name="button">
-    {% endif %}
-</form>
-</div>
-
+    {% include 'bootstrap_body.html' %}
+    <div  align="center">
+    <form action="{{ url_for('deleteItem', item_id=item.id, csrf=csrf) }}" method = 'post'>
+        {% if user != None and item != None and user.id == item.user_id %}
+            <div><h3>Are you sure you want to delete {{item.name}}?:</h3></div>
+            <input type='submit' value='Yes' name="button">
+            <input type='submit' value='No' name="button">
+        {% else %}
+            <!-- this is in case a user tries to navigate directly to the delete url -->
+            <div><h2>You are not the owner of {{item.name}} and cannot delete it.</h2></div>
+            <input type='submit' value='Ok' name="button">
+        {% endif %}
+    </form>
+    </div>
 </body>
-
 </html>

@@ -1,0 +1,38 @@
+    <div class="navbar navbar-inverse navbar-static-top navbar-default" id="topnavbar">
+        <div class="navbar-inner">
+        <div class="containe-fluid">
+            ::before
+           <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse navbar-normal">
+                <ul class="navbar-brand nav navbar-nav">
+                <li class="active"><a href="{{url_for('catalog')}}">Home</a></li>
+                <li><a href="{{url_for('about')}}">About</a></li>
+                     {% if user != None %}
+                    <li><a href="{{url_for('myItems', user_id=user.id)}}">My Items</a> </li>
+                     {% endif %}
+               </ul>
+
+                <ul >
+                    {% if user != None %}
+                        <p class="headerWelcome navbar-text">Welcome: {{user.name}}
+                        <span><img src="{{user.picture}}" style = "margin-right: 5px; width: 32px; height: 32px;border-radius: 16px;-webkit-border-radius: 16px;-moz-border-radius: 16px;"></span>
+                        </p>
+                    {% endif %}
+                    <li class="nav nav-pills pull-right" style="padding-left: 10px;">
+                    {% if user != None %}
+                        <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('logout')}}">Sign out</a></H2>
+                    {% else %}
+                        <H2 type="button" class="active btn btn-default navbar-btn headerBtn"><a href="{{url_for('login')}}">Sign in</a></H2>
+                   {% endif %}
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+        </div>
+    </div>

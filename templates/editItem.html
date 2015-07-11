@@ -1,14 +1,17 @@
-<html>
-<head>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+<!-- saved from url=(0050)http://getbootstrap.com/examples/starter-template/ -->
+<html lang="en">
+    {% include 'cloudinary_head.html' %}
+    <title>Item Catalog</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
 </head>
 
-<body class=pane>
+  <body>
 
-<h1>Edit Menu Item</h1>
+  {% include 'bootstrap_body.html' %}
 
-<div class = 'pane'>
-<form action="{{ url_for('editItem', item_id=item.id )}}" method = 'post'>
+  <div class="container">
+      <H1>Edit Menu Item</H1><br>
+      <form action="{{ url_for('editItem', item_id=item.id ) }}" method = 'post'>
 
 <dl>
 	<dt>Category:
@@ -18,20 +21,40 @@
             {% endfor %}
         </select>
     </dt><br>
-	<dt>Name:</dt>
-		<dd><input type ='text' pattern="[a-zA-Z0-9. -]+" size='30' name='name' value="{{item.name}}"></dd>
+	<dt>Name:
+		<input type ='text' pattern="[a-zA-Z0-9. -]+" size='30' name='name' value="{{item.name}}">
+    </dt>
+    <br>
 	<dt>Description:</dt>
-		<dd><textarea pattern="[a-zA-Z0-9. -]+" name='description' cols="40" rows="6">{{item.description}}</textarea></dd>
-	<dt>Picture:</dt>
-		<dd><input type ='url' name='imageUrl'></dd>
+		<dd><textarea  pattern="[a-zA-Z0-9. -]+" name='description' cols="40" rows="6">{{item.description}}</textarea></dd>
+	<br>
+    <dt>Picture:</dt>
+        <input type ='url' size='30' name='imageUrl' id='imageUrl' placeholder="image url" style="display: none;">
+        <p><img style="position: float;" id="pic" height="60" width="90" src="{{item.picture}}"></p>
+        <div id="opener"></div>
+        <script>
+        cloudinary.applyUploadWidget(document.getElementById('opener'),
+        { upload_preset: 'ydox8tbw', multiple: false, tags: ['user_id: '+{{user.id}}], button_class: 'navbar-brand nav navbar-nav'},
+            function(error, result) {
+                if (result != null) {
+                    $('#pic').attr("src",result[0]['thumbnail_url']);
+                    $('#imageUrl').val(result[0]['url']);
+                } else {
+                    document.getElementById('imageUrl').val('image url');
+                }
+            });
+        </script>
+
 </dl>
-
-
+<br><br><br>
+<div>
 <input type='submit' name="button" value='Update'>
 <input type='submit' name="button" value='Cancel'>
+</div>
 
 </form>
 </div>
 </body>
 
 </html>
+

@@ -27,3 +27,15 @@ Item Catalog
             /catalog/category/<int:category_id>/JSON
             /catalog/viewItem/<int:item_id>/JSON
             /catalog/myItems/<int:user_id>/JSON
+
+Designed for use with:
+
+        SQLite  -- version 3.8.9
+        
+        SQLAchemy (http://www.sqlalchemy.org/) -- version 0.8.4
+
+        Python (https://www.python.org/downloads/) -- version 2.7.6
+        
+        Flask (http://flask.pocoo.org/) -- version 0.10.1
+        
+        Bootstrap (http://getbootstrap.com/) -- version 3.3.4 (included in this repository)

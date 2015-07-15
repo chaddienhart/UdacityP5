@@ -15,6 +15,7 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import json
+
 from flask import make_response
 import requests
 import os
@@ -168,7 +169,7 @@ def editItem(item_id):
     updated_item = db_session.query(Item).filter_by(id=item_id).one()
     user = getCurrentUser()
     if request.method == 'POST':
-        if request.form['button'] == 'Update' and request.form['name'] != None:
+        if request.form['button'] == 'Update' and request.form['name'] != None and request.form['name'] != '':
             updated_item.name = request.form['name']
             updated_item.description = request.form['description']
             # remove the old picture if it is being updated

@@ -29,7 +29,7 @@
 		<dd><textarea  pattern="[a-zA-Z0-9. -]+" name='description' cols="40" rows="6">{{item.description}}</textarea></dd>
 	<br>
     <dt>Picture:</dt>
-        <input type ='url' size='30' name='imageUrl' id='imageUrl' placeholder="image url" style="display: none;">
+        <input type ='url' size='30' name='imageUrl' id='imageUrl' placeholder="image url" style="display: none;" value="{{item.picture}}">
         <p><img style="position: float;" id="pic" height="60" width="90" src="{{item.picture}}"></p>
         <div id="opener"></div>
         <script>

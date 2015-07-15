@@ -1,0 +1,10 @@
+        <div class="additem">
+            {% if i.picture != None and i.picture != ''%}
+                <img src="{{i.picture}}"  height="60" width="90" style="float: none; margin-right: 5px;"/>
+            {% endif %}
+            <div style="display:block;">
+            <a href="{{ url_for('viewItem', item_id=i.id) }}">{{i.name}}</a>
+            <br>
+            <text>{{i.description}}</text>
+            </div>
+        </div>

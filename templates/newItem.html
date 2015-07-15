@@ -12,13 +12,17 @@
 
   <div class="container">
       <H1>Add an item</H1><br>
-      <form action="{{ url_for('newItem' )}}" method = 'post'>
+      <form action="{{ url_for('newItem', category_id=category_id)}}" method = 'post'>
 
     <dl>
 	    <dt>Category:
         <select name="category">
             {% for c in categories %}
-                <option value="{{c.name}}">{{c.name}}</option>
+                <option value="{{c.name}}"
+                {% if c.id == category_id %}
+                    selected
+                {% endif %}
+                >{{c.name}}</option>
             {% endfor %}
         </select>
         </dt>

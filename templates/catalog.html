@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     {% include 'bootstrap_head.html' %}
-    <title>Item Catalog</title>
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
 </head>
 
@@ -12,6 +11,7 @@
 
     <div class="container">
   	<div class="row">
+        <!--use bootstrap to create two side by side panels to contain the categories and recent items-->
         <div class="col-md-6 col-sm-6">
           <div class="panel panel-default">
             <div class="panel-heading panel-heading-custom text-center"><h3>Categories</h3></div>
@@ -26,8 +26,10 @@
           <div class="panel panel-default">
             <div class="panel-heading panel-heading-custom text-center"><h3>Recent items</h3></div>
             <div class="panel-body">
+                <!--Iterate over the items in the recent list and use teh itemInList formating block-->
                 {% for c in range(0, items.count()) %}
-                <h3 class="text-center"><a href="{{url_for('viewItem', item_id=items[c].id)}}">{{items[c].name}}</h3>
+                    {% set i = items[c] %}
+                    {% include 'itemInList.html' %}
                 {% endfor %}
             </div>
           </div>

@@ -1,24 +1,21 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
-
-    <title>Signin for Item Catalog</title>
-    <!-- Bootstrap core CSS -->
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap-theme.min.css')}}">
-
+    {% include 'bootstrap_head.html' %}
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css')}}">
+    <!--Include all the callback javascript functions-->
+    {% include 'signin.html' %}
 </head>
 
-<body>
-<div class="container-full">
+<body style="padding-top: 10%;">
+<div class="container-full v-center">
     <div class="row">
         <div class="col-lg-12 text-center v-center">
             <div id="signintext">
                 <H2>Sign in with one of the following</H2>
             </div>
             <br>
+            <!--Google plus sign in button-->
             <div id="gSigninButton">
                 <span class="g-signin"
                       data-scope="openid email"
@@ -30,29 +27,28 @@
                       data-approvalprompt="force">
                 </span>
             </div>
+            <br>
+
+            <!--Login with Facebook button-->
             <div id="fbSigninButton">
-                <span class="g-signin">
+            <!--<div id="fb-root" > console shows a warning that this div has not been created, but if it is the
+            button is shifted left. tried lots of css to move it over again but no luck-->
+                <span>
                     <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
                         <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
                     </fb:login-button>
                 </span>
+            <!--</div>-->
             </div>
+            <br>
+
+            <!--Login with Github button-->
             <div id="ghubSigninButton">
-                <!--<span class="g-signin"-->
-                      <!--data-scope="user:email"-->
-                      <!--data-clientid="e4cc328fc85672418649"-->
-                      <!--data-redirecturi="postmessage"-->
-                      <!--data-accesstype="offline"-->
-                      <!--data-cookiepolicy="single_host_origin"-->
-                      <!--data-callback="gitSignInCallback"-->
-                      <!--data-approvalprompt="force">-->
-                <!--</span>-->
                 <div class="github_button btn">
                     <img class="img-responsive" style="max-width:32px; margin-right: 5px;"
                             src="{{ url_for('static', filename = 'Octocat-Light-32px.png') }}"
                             alt="Home" height="16" width="16">
-                    <!--<a href="https://github.com/login/oauth/authorize?client_id=e4cc328fc85672418649&scope=user:email&state={{state}}">-->
-                    <a href="javascript:githubAuth()">
+                     <a href="javascript:githubAuth()">
                     Login with GitHub</a>
                 </div>
             </div>
@@ -60,97 +56,10 @@
         </div>
     </div>
 </div>
-<script>
-    // used to show the user we are processing the request
-    function hideButtons() {
-             // hide the login button and change the message
-            $('#signintext H2').text('Authenticating...');
-            $('#gSigninButton').attr('style', 'display: none');
-            $('#fbSigninButton').attr('style', 'display: none');
-            $('#ghubSigninButton').attr('style', 'display: none');
-    }
 
-    function githubAuth() {
-        hideButtons();
-        window.location.href =
-            "https://github.com/login/oauth/authorize?client_id=e4cc328fc85672418649&scope=user:email&state={{state}}";
-    }
-
-    // Google sign in callback
-    function signInCallback(authResult) {
-        // check for the authcode being returned
-        if(authResult['code']) {
-            hideButtons();
-            // send the state code to the server
-            $.ajax({
-                type: 'POST',
-                url: '/gconnect/?state={{state}}',
-                processData: false,
-                contentType: 'application/octet-stream; charset=utf-8',
-                data: authResult['code'],
-                success: function(result) {
-                    if (result) {
-                        $('#signintext H2').attr('style', 'display: none');
-                        $('#result').html( result )
-                        setTimeout(function() { window.location.href = "{{ next }}"; }, 4000);
-                    }
-                    else if (authResult['error']) {
-                        console.log('There was an error: ' + authResult['error']);
-                    } else {
-                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-                    }
-                }
-            });
-        }
-    }
-
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '1383567111942017',
-            cookie     : true,  // enable cookies to allow the server to access
-                                // the session
-            xfbml      : true,  // parse social plugins on this page
-            version    : 'v2.3' // use version 2.3
-        });
-    };
-
-    // Load the SDK asynchronously
-    (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-
-    // Here we run a very simple test of the Graph API after login is
-    // successful.  See statusChangeCallback() for when this call is made.
-    function sendTokenToServer() {
-        var access_token = FB.getAuthResponse()['accessToken'];
-        console.log(access_token)
-        console.log('Welcome!  Fetching your information.... ');
-        hideButtons();
-        FB.api('/me', function(response) {
-            console.log('Successful login for: ' + response.name);
-            $.ajax({
-                type: 'POST',
-                url: '/fbconnect/?state={{state}}',
-                processData: false,
-                data: access_token,
-                contentType: 'application/octet-stream; charset=utf-8',
-                success: function(result) {
-                    // Handle or verify the server response if necessary.
-                    if (result) {
-                        $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
-                        setTimeout(function() { window.location.href = "{{ next }}"; }, 4000);
-                    } else {
-                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-                    }
-                }
-            });
-        });
-    }
-</script>
+<!--Move the google sign in script loading to the end of the page to avoid -->
+<!--false positive of cookiepolicy required error-->
+<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
 
 </body>
 

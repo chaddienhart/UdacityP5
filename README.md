@@ -22,11 +22,16 @@
     * http://localhost:5000/
 5. You can navigate around the app to view categories and items
 6. Sign in and you can add and edit your own items.
-7. Support JSON from the following:
+7. Supports JSON from the following:
     * /catalog/JSON
     * /catalog/category/<int:category_id>/JSON
     * /catalog/viewItem/<int:item_id>/JSON
     * /catalog/myItems/<int:user_id>/JSON
+8. Supports XML from the following:
+    * /catalog/XML
+    * /catalog/category/<int:category_id>/XML
+    * /catalog/viewItem/<int:item_id>/XML
+    * /catalog/myItems/<int:user_id>/XML
 
 #### Designed for use with:
 * SQLite  -- version 3.8.9

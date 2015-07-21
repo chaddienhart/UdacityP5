@@ -1,6 +1,6 @@
-# Udacity Full Stack Web Developer Project 3
+# Udacity Full Stack Web Developer 
 
-# Item Catalog
+# Project 3 - Item Catalog
 
 * Python and Flask are used to provide the backend web server for this web app.
 * Uses SQLAlchemy to access an SQLite database of categoried items.

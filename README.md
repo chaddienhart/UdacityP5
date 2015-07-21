@@ -1,5 +1,4 @@
-# Udacity Full Stack Web Developer 
-
+# Udacity Full Stack Web Developer
 # Project 3 - Item Catalog
 
 * Python and Flask are used to provide the backend web server for this web app.
@@ -15,13 +14,15 @@
 #### To use this source:
 1. setup Cloudinary by running the following from a shell prompt:
     * sudo pip install cloudinary
-2. start the web server by running the following from a shell prompt:
+2. setup dict2xml by running the following from a shell prompt:
+    * sudo pip install dict2xml
+3. start the web server by running the following from a shell prompt:
     * /Item_Catalog$ python catalog_app.py
-3. open a browser (tested with Chrome) and navigate to
+4. open a browser (tested with Chrome) and navigate to
     * http://localhost:5000/
-4. You can navigate around the app to view categories and items
-5. Sign in and you can add and edit your own items.
-6. Support JSON from the following:
+5. You can navigate around the app to view categories and items
+6. Sign in and you can add and edit your own items.
+7. Support JSON from the following:
     * /catalog/JSON
     * /catalog/category/<int:category_id>/JSON
     * /catalog/viewItem/<int:item_id>/JSON

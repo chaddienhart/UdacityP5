@@ -9,12 +9,14 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Item
 
 from flask import session as login_session
+from functools import wraps
 import random, string
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import json
+from dict2xml import dict2xml as xmlify
 
 from flask import make_response
 import requests
@@ -36,73 +38,111 @@ DBSession = sessionmaker(bind = engine)
 db_session = DBSession()
 
 
-'''
-The 'Home' page for this app
-Displays a list of categories on the left and ten most recent items on the right
-The current user (or lack of one) determine the if the sign out / sign in button is displayed
-if there is a user a welcome message is also displayed in the nav bar
-'''
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if getCurrentUser() is None:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/')
 @app.route('/catalog/')
 def catalog():
+    """
+    The 'Home' page for this app
+    Displays a list of categories on the left and ten most recent items on the right
+    The current user (or lack of one) determine the if the sign out / sign in button is displayed
+    if there is a user a welcome message is also displayed in the nav bar
+    """
     categories = db_session.query(Category).group_by(Category.name).distinct()
     user = getCurrentUser()
     itemgroup = db_session.query(Item).order_by(Item.id.desc()).limit(10)
     return render_template('catalog.html', categories=categories, items=itemgroup, user=user)
 
 
-'''
-Returns tne JSON for the entire catalog, which will contain each category, and within each
-category each item.
-'''
 @app.route('/catalog/JSON')
 def catalogJSON():
+    """
+    Returns tne JSON for the entire catalog, which will contain each category, and within each
+    category each item.
+    """
+    return jsonify(Catalog=[catalogasdictionary()])
+
+
+@app.route('/catalog/XML')
+def catalogXML():
+    """
+    Returns tne XML for the entire catalog, which will contain each category, and within each
+    category each item.
+    """
+    return xmlify(catalogasdictionary(), wrap='catalog', indent='    '), 200, {'Content-Type': 'text/css; charset=utf-8'}
+
+
+def catalogasdictionary():
     categories = db_session.query(Category).all()
     serializedCat = []
     for cat in categories:
         newCat = cat.serialize
-        items = db_session.query(Item).filter_by(category_id = cat.id).all()
+        items = db_session.query(Item).filter_by(category_id=cat.id).all()
         serialItems = []
         for i in items:
             serialItems.append(i.serialize)
         newCat['items'] = serialItems
         serializedCat.append(newCat)
-    return jsonify(Catalog=[serializedCat])
+    return serializedCat
 
 
-'''
-Displays the category with a link to add a new item.
-If the user is not logged in they will be asked to sign in after pressing the Add new item button
-after signing in they will then be redirected to the category page again.
-'''
 @app.route('/catalog/category/<int:category_id>/')
 def viewCategory(category_id):
+    """
+    Displays the category with a link to add a new item.
+    If the user is not logged in they will be asked to sign in after pressing the Add new item button
+    after signing in they will then be redirected to the category page again.
+    """
     category = db_session.query(Category).filter(Category.id == category_id).first()
     itemgroup = db_session.query(Item).filter(Item.category_id == category_id).all()
     user = getCurrentUser()
     return render_template('category.html', category=category, items=itemgroup, user=user)
 
 
-'''
-Returns the JSON for the items in the category_id requested.
-If the category does not exist, an empty list is returned.
-'''
 @app.route('/catalog/category/<int:category_id>/JSON')
 def categoryJSON(category_id):
+    """
+    Returns the JSON for the items in the category_id requested.
+    If the category does not exist, an empty list is returned.
+    """
     category = db_session.query(Category).filter(Category.id == category_id).first()
     itemgroup = db_session.query(Item).filter(Item.category_id == category_id).all()
     return jsonify(Category=[item.serialize for item in itemgroup])
 
 
-'''
-Adding new items can only be done by authenticated users, redirect to login if not signed in (user == None)
-GET brings up the newItem template
-POST will either add a new item to the database or clean up any photos that were uploaded and redirect
-back to the category
-'''
+@app.route('/catalog/category/<int:category_id>/XML')
+def categoryXML(category_id):
+    """
+    Returns the XML for the items in the category_id requested.
+    If the category does not exist, an empty list is returned.
+    """
+    cat = db_session.query(Category).filter(Category.id == category_id).first()
+    newCat = cat.serialize
+    items = db_session.query(Item).filter_by(category_id=cat.id).all()
+    serialItems = []
+    for i in items:
+        serialItems.append(i.serialize)
+    newCat['items'] = serialItems
+    return xmlify(newCat, wrap='Category', indent='    '), 200, {'Content-Type': 'text/css; charset=utf-8'}
+
+
 @login_required
 @app.route('/catalog/addNewItem/<int:category_id>/', methods=['GET', 'POST'])
 def newItem(category_id):
+    """
+    Adding new items can only be done by authenticated users, redirect to login if not signed in (user == None)
+    GET brings up the newItem template
+    POST will either add a new item to the database or clean up any photos that were uploaded and redirect
+    back to the category
+    """
     user = getCurrentUser()
     if request.method == 'POST':
         if request.form['button'] == 'Create' and request.form['name'] != None and request.form['name'] != '':
@@ -123,14 +163,14 @@ def newItem(category_id):
         return render_template('newItem.html', categories=categories, user=user, category_id=category_id)
 
 
-'''
-Deleting an item can only be performed by the owner, if not the user return to the item view
-Verify that the user wants to delete the item and protect against CSRF by creating a unique token
-when verifying and checking that the token matches on the POST request
-'''
 @login_required
 @app.route('/catalog/deleteItem/<int:item_id>/', methods=['GET', 'POST'])
 def deleteItem(item_id):
+    """
+    Deleting an item can only be performed by the owner, if not the user return to the item view
+    Verify that the user wants to delete the item and protect against CSRF by creating a unique token
+    when verifying and checking that the token matches on the POST request
+    """
     user = getCurrentUser()
     item = db_session.query(Item).filter(Item.id == item_id).one()
     # prevent non item owner from deleting the item, redirect anyone else
@@ -161,12 +201,12 @@ def deleteItem(item_id):
         return render_template('deleteItem.html', item=item, user=user, csrf=csrf)
 
 
-'''
-similar to adding a new item except the button is update instead of create.
-'''
 @login_required
 @app.route('/catalog/editItem/<int:item_id>/', methods=['GET', 'POST'])
 def editItem(item_id):
+    """
+    similar to adding a new item except the button is update instead of create.
+    """
     updated_item = db_session.query(Item).filter_by(id=item_id).one()
     user = getCurrentUser()
     if request.method == 'POST':
@@ -201,11 +241,20 @@ def itemJSON(item_id):
     item = db_session.query(Item).filter_by(id = item_id).one()
     return jsonify(Item=item.serialize)
 
-'''
-Renders a page with all the items added by the user as long as they are currently signed in
-'''
+
+@app.route('/catalog/viewItem/<int:item_id>/XML')
+def itemXML(item_id):
+    item = db_session.query(Item).filter_by(id = item_id).one()
+    serialItem = []
+    serialItem.append(item.serialize)
+    return xmlify(serialItem, wrap='Item', indent='    '), 200, {'Content-Type': 'text/css; charset=utf-8'}
+
+
 @app.route('/catalog/myItems/<int:user_id>')
 def myItems(user_id):
+    """
+    Renders a page with all the items added by the user as long as they are currently signed in
+    """
     user = getCurrentUser()
     # prevent non item owner from viewing myItems
     if user is None or user_id != user.id:
@@ -215,12 +264,12 @@ def myItems(user_id):
     return render_template('myItems.html', items=items, user=user)
 
 
-'''
-Returns the JSON for the items added by the user_id requested, only if that is the current user
-If the user is not the current user return an empty list is returned.
-'''
 @app.route('/catalog/myItems/<int:user_id>/JSON')
 def myItemsJSON(user_id):
+    """
+    Returns the JSON for the items added by the user_id requested, only if that is the current user
+    If the user is not the current user return an empty list is returned.
+    """
     user = getCurrentUser()
     # prevent non item owner from viewing myItems
     if user is None or user_id != user.id:
@@ -230,21 +279,39 @@ def myItemsJSON(user_id):
     return jsonify(Category=[item.serialize for item in items])
 
 
-'''
-Provide some background info on the app, user is needed for use in the bootstrap nav bar
-'''
+@app.route('/catalog/myItems/<int:user_id>/XML')
+def myItemsXML(user_id):
+    """
+    Returns the XML for the items added by the user_id requested, only if that is the current user
+    If the user is not the current user return an empty list is returned.
+    """
+    user = getCurrentUser()
+    serialItem = []
+    # prevent non item owner from viewing myItems
+    if user is None or user_id != user.id:
+        # return empty
+        return xmlify(serialItem, wrap='Item', indent='    '), 200, {'Content-Type': 'text/css; charset=utf-8'}
+    items = db_session.query(Item).filter_by(user_id = user_id).order_by(Item.category_id).all()
+    for i in items:
+        serialItem.append(i.serialize)
+    return xmlify(serialItem, wrap='Item', indent='    '), 200, {'Content-Type': 'text/css; charset=utf-8'}
+
+
 @app.route('/catalog/about/')
 def about():
+    """
+    Provide some background info on the app, user is needed for use in the bootstrap nav bar
+    """
     user = getCurrentUser()
     return render_template('about.html', user=user)
 
 
-'''
-displays the login page with a list of supported OAuth2 providers for authentication
-get the redirect target so that the request returns to the page that the request to originate came from
-'''
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
+    """
+    displays the login page with a list of supported OAuth2 providers for authentication
+    get the redirect target so that the request returns to the page that the request to originate came from
+    """
     next = get_redirect_target()
     if next is None:
         next = url_for('catalog')
@@ -257,12 +324,12 @@ def login():
     return render_template('login.html', state=state, next=next)
 
 
-'''
-Create a single html location to call to logout, call the correct disconnect from here based on the
-current authentication provider.
-'''
 @app.route('/logout/')
 def logout():
+    """
+    Create a single html location to call to logout, call the correct disconnect from here based on the
+    current authentication provider.
+    """
     if login_session['provider'] == 'google':
         return redirect(url_for('gdisconnect'))
     if login_session['provider'] == 'facebook':
@@ -270,23 +337,23 @@ def logout():
     if login_session['provider'] == 'github':
         return redirect(url_for('ghubdisconnect'))
 
-'''
-get authentication from Google oauth2
-    success: render loginsuccess.html with username and image
-        -note: redirects to catalog if successful after 4 seconds see signin.html signInCallback
-    failure: return error code and remain on login screen
-    1. verify the login_session['state'] matches to guard against cross site impersonation
-    2. use oauth2client.client to get credentials from the code (passed in as request.data)
-    3. use the token to get info, send and error if the token is invalid
-    4. verify the token is for the credentialed user
-    5. verify the token was intended to for use by this app
-    6. check to see it the current user is already logged in if so return with 200
-    7. create a new user if needed, store the users info in the login_session
-    8. redirect (temporarily) to loginsuccess.html (see note above)
-'''
 GOOGLEID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
 @app.route('/gconnect/', methods=['POST'])
 def gconnect():
+    """
+    get authentication from Google oauth2
+        success: render loginsuccess.html with username and image
+            -note: redirects to catalog if successful after 4 seconds see signin.html signInCallback
+        failure: return error code and remain on login screen
+        1. verify the login_session['state'] matches to guard against cross site impersonation
+        2. use oauth2client.client to get credentials from the code (passed in as request.data)
+        3. use the token to get info, send and error if the token is invalid
+        4. verify the token is for the credentialed user
+        5. verify the token was intended to for use by this app
+        6. check to see it the current user is already logged in if so return with 200
+        7. create a new user if needed, store the users info in the login_session
+        8. redirect (temporarily) to loginsuccess.html (see note above)
+    """
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('invalid state parameter'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -362,12 +429,12 @@ def gconnect():
     return render_template('loginsuccess.html', username=login_session['username'], picture=login_session['picture'])
 
 
-'''
-    disconnect login by revoking current login_session token
-    delete login_session data
-'''
 @app.route("/gdisconnect/")
 def gdisconnect():
+    """
+        disconnect login by revoking current login_session token
+        delete login_session data
+    """
     access_token = login_session['access_token']
     if access_token is None:
         response = make_response(json.dumps('Current user not connected.'), 401)
@@ -379,7 +446,7 @@ def gdisconnect():
 
     if result['status'] != '200':
         print 'failed to gdisconnect'
-        # # For whatever reason, the given token was invalid. We still want to log out the current user
+        # For whatever reason, the given token was invalid. We still want to log out the current user
 
     # clear the login session
     del login_session['access_token']
@@ -391,21 +458,21 @@ def gdisconnect():
     return redirect(url_for('catalog'))
 
 
-'''
-get authentication from Facebook oauth2
-    success: render loginsuccess.html with username and image
-        -note: redirects to catalog if successful after 4 seconds see signin.html sendTokenToServer
-    failure: return error code and remain on login screen
-    1. verify the login_session['state'] matches to guard against cross site impersonation
-    2. request a token
-    3. use the token to get info, send and error if the token is invalid
-    4. create a new user if needed, store the users info in the login_session
-    5. redirect (temporarily) to loginsuccess.html (see note above)
-'''
 FBID = json.loads(open('fbclient_secret.json', 'r').read())['web']['app_id']
 FBSCRT = json.loads(open('fbclient_secret.json', 'r').read())['web']['app_secret']
 @app.route('/fbconnect/', methods=['POST'])
 def fbconnect():
+    """
+    get authentication from Facebook oauth2
+        success: render loginsuccess.html with username and image
+            -note: redirects to catalog if successful after 4 seconds see signin.html sendTokenToServer
+        failure: return error code and remain on login screen
+        1. verify the login_session['state'] matches to guard against cross site impersonation
+        2. request a token
+        3. use the token to get info, send and error if the token is invalid
+        4. create a new user if needed, store the users info in the login_session
+        5. redirect (temporarily) to loginsuccess.html (see note above)
+    """
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('invalid state parameter'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -460,12 +527,12 @@ def fbconnect():
     return render_template('loginsuccess.html', username=login_session['username'], picture=login_session['picture'])
 
 
-'''
-    disconnect login by revoking current login_session token
-    delete login_session data
-'''
 @app.route('/fbdisconnect/')
 def fbdisconnect():
+    """
+        disconnect login by revoking current login_session token
+        delete login_session data
+    """
     facebook_id = login_session['facebook_id']
     print facebook_id
     # The access token must me included to successfully logout
@@ -488,20 +555,20 @@ def fbdisconnect():
     return redirect(url_for('catalog'))
 
 
-'''
-Get Authentication from GitHub OAuth2
-    success: render catalog.html with username and image
-    failure: return error code and remain on login screen
-    1. verify the login_session['state'] matches to guard against cross site impersonation
-    2. use the code returned from authorization request to request an access token
-    3. use the token to get info, send and error if the token is invalid
-    4. create a new user if needed, store the users info in the login_session
-    5. redirect to catalog.html
-'''
 GHID = json.loads(open('ghubclient_secret.json', 'r').read())['web']['app_id']
 GHSCRT = json.loads(open('ghubclient_secret.json', 'r').read())['web']['app_secret']
 @app.route('/ghubconnect/', methods=['GET'])
 def ghubconnect():
+    """
+    Get Authentication from GitHub OAuth2
+        success: render catalog.html with username and image
+        failure: return error code and remain on login screen
+        1. verify the login_session['state'] matches to guard against cross site impersonation
+        2. use the code returned from authorization request to request an access token
+        3. use the token to get info, send and error if the token is invalid
+        4. create a new user if needed, store the users info in the login_session
+        5. redirect to catalog.html
+    """
     code = request.args.get('code')
     state = request.args.get('state')
     if state != login_session['state']:
@@ -548,13 +615,12 @@ def ghubconnect():
     return redirect(url_for('catalog'))
 
 
-'''
-    disconnect login by deleting the login_session data
-    users can revoke access from their GitHub account, under Personal settings/Applications
-'''
 @app.route('/ghubdisconnect/')
 def ghubdisconnect():
-    # clear the login session
+    """
+    disconnect login by deleting the login_session data
+    users can revoke access from their GitHub account, under Personal settings/Applications
+    """
     del login_session['access_token']
     del login_session['username']
     del login_session['email']
@@ -564,7 +630,7 @@ def ghubdisconnect():
     return redirect(url_for('catalog'))
 
 
-''' Helper functions '''
+""" Helper functions """
 def createUser(login_session):
     # create the user object, add it to the db, and commit the change
     newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
@@ -596,11 +662,11 @@ def getCurrentUser():
     return user
 
 
-'''
-some code to get request orign to redirect back after going to the login page
-see http://flask.pocoo.org/snippets/62/ for redirect snippet reference
-'''
 def get_redirect_target():
+    """
+    some code to get request orign to redirect back after going to the login page
+    see http://flask.pocoo.org/snippets/62/ for redirect snippet reference
+    """
     for target in request.values.get('next'), request.referrer:
         if not target:
             continue
@@ -608,21 +674,17 @@ def get_redirect_target():
 
 
 def redirect_back(endpoint, **values):
+    """
+    some code to get request orign to redirect back after going to the login page
+    see http://flask.pocoo.org/snippets/62/ for redirect snippet reference
+    """
     print endpoint
     print values
     target = request.form['next']
     if not target or not is_safe_url(target):
         target = url_for(endpoint, **values)
     return redirect(target)
-''' end redirect snippet reference'''
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if getCurrentUser() is None:
-            return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
 
 if __name__ == "__main__":
     app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))

@@ -100,6 +100,7 @@ GET brings up the newItem template
 POST will either add a new item to the database or clean up any photos that were uploaded and redirect
 back to the category
 '''
+@login_required
 @app.route('/catalog/addNewItem/<int:category_id>/', methods=['GET', 'POST'])
 def newItem(category_id):
     user = getCurrentUser()
@@ -118,8 +119,6 @@ def newItem(category_id):
                 cloudinary.api.delete_resources([os.path.splitext(os.path.basename(request.form['imageUrl']))[0]])
         return redirect(url_for('viewCategory', category_id=category_id))
     else:
-        if user is None:
-            return redirect(url_for('login'))
         categories = db_session.query(Category).group_by(Category.name).distinct()
         return render_template('newItem.html', categories=categories, user=user, category_id=category_id)
 
@@ -129,6 +128,7 @@ Deleting an item can only be performed by the owner, if not the user return to t
 Verify that the user wants to delete the item and protect against CSRF by creating a unique token
 when verifying and checking that the token matches on the POST request
 '''
+@login_required
 @app.route('/catalog/deleteItem/<int:item_id>/', methods=['GET', 'POST'])
 def deleteItem(item_id):
     user = getCurrentUser()
@@ -164,6 +164,7 @@ def deleteItem(item_id):
 '''
 similar to adding a new item except the button is update instead of create.
 '''
+@login_required
 @app.route('/catalog/editItem/<int:item_id>/', methods=['GET', 'POST'])
 def editItem(item_id):
     updated_item = db_session.query(Item).filter_by(id=item_id).one()
@@ -615,6 +616,13 @@ def redirect_back(endpoint, **values):
     return redirect(target)
 ''' end redirect snippet reference'''
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if getCurrentUser() is None:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
 
 if __name__ == "__main__":
     app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))

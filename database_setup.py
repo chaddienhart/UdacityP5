@@ -45,9 +45,9 @@ class Item(Base):
     id = Column(Integer, primary_key = True)
     description = Column(String(250))
     picture = Column(String(250))
-    category_id = Column(Integer,ForeignKey('categories.id'))
+    category_id = Column(Integer,ForeignKey('categories.id', ondelete='CASCADE'))
     categories = relationship(Category)
-    user_id = Column(Integer,ForeignKey('users.id'))
+    user_id = Column(Integer,ForeignKey('users.id', ondelete='CASCADE'))
     users = relationship(User)
     #date_added = Column(DateTime, default=datetime.datetime.utcnow)
 

@@ -2,10 +2,10 @@
 
 # Item Catalog
 
-#### Python and Flask are used to provide the backend web server for this web app.
-#### Uses SQLAlchemy to access an SQLite database of categoried items.
-#### Bootstrap is used to provide a responsive UI experience and consistent nav bar
-#### Cloudinary is used to upload pictures.
+* Python and Flask are used to provide the backend web server for this web app.
+* Uses SQLAlchemy to access an SQLite database of categoried items.
+* Bootstrap is used to provide a responsive UI experience and consistent nav bar
+* Cloudinary is used to upload pictures.
 
 #### Users can be signed in after authentication with one of the following OAuth2 service providers:
 * Google

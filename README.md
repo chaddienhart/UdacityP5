@@ -39,3 +39,4 @@
 * Python (https://www.python.org/downloads/) -- version 2.7.6
 * Flask (http://flask.pocoo.org/) -- version 0.10.1
 * Bootstrap (http://getbootstrap.com/) -- version 3.3.4 (included in this repository)
+* dict2xml (https://github.com/delfick/python-dict2xml)

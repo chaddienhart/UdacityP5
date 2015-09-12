@@ -32,7 +32,8 @@ cloudinary.config(
 )
 cloudinaryurl = "http://res.cloudinary.com/hi/image/upload/"
 
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('postgresql://catalog:udacity@localhost/itemcatalog')
+
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 db_session = DBSession()
@@ -689,4 +690,4 @@ def redirect_back(endpoint, **values):
 if __name__ == "__main__":
     app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     app.debug = True
-    app.run(host = '0.0.0.0', port = 5000)
+    app.run(host = '0.0.0.0', port = 80)

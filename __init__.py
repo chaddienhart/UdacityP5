@@ -32,7 +32,7 @@ cloudinary.config(
 )
 cloudinaryurl = "http://res.cloudinary.com/hi/image/upload/"
 
-engine = create_engine('postgresql://catalog:udacity@localhost/itemcatalog')
+engine = create_engine('postgresql+psycopg2://catalog:catalog@localhost/itemcatalog')
 
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
@@ -338,7 +338,7 @@ def logout():
     if login_session['provider'] == 'github':
         return redirect(url_for('ghubdisconnect'))
 
-GOOGLEID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
+GOOGLEID = json.loads(open('/var/www/FlaskApp/FlaskApp/client_secret.json', 'r').read())['web']['client_id']
 @app.route('/gconnect/', methods=['POST'])
 def gconnect():
     """
@@ -362,7 +362,7 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/FlaskApp/client_secret.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(request.data)
     except FlowExchangeError:
@@ -459,8 +459,8 @@ def gdisconnect():
     return redirect(url_for('catalog'))
 
 
-FBID = json.loads(open('fbclient_secret.json', 'r').read())['web']['app_id']
-FBSCRT = json.loads(open('fbclient_secret.json', 'r').read())['web']['app_secret']
+FBID = json.loads(open('/var/www/FlaskApp/FlaskApp/fbclient_secret.json', 'r').read())['web']['app_id']
+FBSCRT = json.loads(open('/var/www/FlaskApp/FlaskApp/fbclient_secret.json', 'r').read())['web']['app_secret']
 @app.route('/fbconnect/', methods=['POST'])
 def fbconnect():
     """
@@ -556,8 +556,8 @@ def fbdisconnect():
     return redirect(url_for('catalog'))
 
 
-GHID = json.loads(open('ghubclient_secret.json', 'r').read())['web']['app_id']
-GHSCRT = json.loads(open('ghubclient_secret.json', 'r').read())['web']['app_secret']
+GHID = json.loads(open('/var/www/FlaskApp/FlaskApp/ghubclient_secret.json', 'r').read())['web']['app_id']
+GHSCRT = json.loads(open('/var/www/FlaskApp/FlaskApp/ghubclient_secret.json', 'r').read())['web']['app_secret']
 @app.route('/ghubconnect/', methods=['GET'])
 def ghubconnect():
     """
@@ -690,4 +690,4 @@ def redirect_back(endpoint, **values):
 if __name__ == "__main__":
     app.secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
     app.debug = True
-    app.run(host = '0.0.0.0', port = 5000)
+    app.run(host = '0.0.0.0', port = 80)

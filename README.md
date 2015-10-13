@@ -6,3 +6,5 @@ repository created from UdacityP3_ItemCatalog proj5 branch using:
 
 See: https://github.com/chaddienhart/UdacityP3_ItemCatalog/blob/master/README.md for details on the contents of the web app
 
+# Work in progress check back for updates
+

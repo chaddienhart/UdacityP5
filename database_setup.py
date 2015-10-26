@@ -63,7 +63,7 @@ class Item(Base):
             #'date added' : self.date_added
         }
 
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('postgres://postgres@/catalog')
 
 Base.metadata.create_all(engine)
 

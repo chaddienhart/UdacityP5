@@ -16,8 +16,8 @@
           <div class="panel panel-default">
             <div class="panel-heading panel-heading-custom text-center"><h3>Categories</h3></div>
             <div class="panel-body">
-                {% for c in range(0, categories.count()) %}
-                <h3 class="text-center"><a href="{{url_for('viewCategory', category_id=categories[c].id)}}">{{categories[c].name}}</a></h3>
+                {% for category in categories %}
+                <h3 class="text-center"><a href="{{url_for('viewCategory', category_id=category.id)}}">{{category.name}}</a></h3>
                 {% endfor %}
             </div>
           </div>
@@ -27,8 +27,8 @@
             <div class="panel-heading panel-heading-custom text-center"><h3>Recent items</h3></div>
             <div class="panel-body">
                 <!--Iterate over the items in the recent list and use teh itemInList formating block-->
-                {% for c in range(0, items.count()) %}
-                    {% set i = items[c] %}
+                {% for item in items %}
+                    {% set i = item %}
                     {% include 'itemInList.html' %}
                 {% endfor %}
             </div>

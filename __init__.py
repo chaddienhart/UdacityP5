@@ -32,7 +32,7 @@ cloudinary.config(
 )
 cloudinaryurl = "http://res.cloudinary.com/hi/image/upload/"
 
-engine = create_engine('postgresql+psycopg2://catalog:catalog@localhost/itemcatalog')
+engine = create_engine('postgresql+psycopg2://catalog:catalog@localhost/catalog')
 
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
@@ -57,9 +57,9 @@ def catalog():
     The current user (or lack of one) determine the if the sign out / sign in button is displayed
     if there is a user a welcome message is also displayed in the nav bar
     """
-    categories = db_session.query(Category).group_by(Category.name).distinct()
+    categories = db_session.query(Category).all()
     user = getCurrentUser()
-    itemgroup = db_session.query(Item).order_by(Item.id.desc()).limit(10)
+    itemgroup = db_session.query(Item)
     return render_template('catalog.html', categories=categories, items=itemgroup, user=user)
 
 
@@ -160,7 +160,7 @@ def newItem(category_id):
                 cloudinary.api.delete_resources([os.path.splitext(os.path.basename(request.form['imageUrl']))[0]])
         return redirect(url_for('viewCategory', category_id=category_id))
     else:
-        categories = db_session.query(Category).group_by(Category.name).distinct()
+        categories = db_session.query(Category).all()
         return render_template('newItem.html', categories=categories, user=user, category_id=category_id)
 
 
@@ -186,7 +186,7 @@ def deleteItem(item_id):
             return response
 
         if request.form['button'] == 'Yes':
-            itemCategory = db_session.query(Category).filter(Category.id == item.category_id).one()
+            itemCategory = db_session.query(Category).filter(Category.id == item.category_id)
             # remove the image from cloudinary storage
             if item.picture != None:
                 cloudinary.api.delete_resources([os.path.splitext(os.path.basename(item.picture))[0]])
@@ -226,7 +226,7 @@ def editItem(item_id):
 
         return redirect(url_for('viewItem', item_id=item_id))
     else:
-        categories = db_session.query(Category).group_by(Category.name).distinct()
+        categories = db_session.query(Category).all()
         return render_template('editItem.html', item=updated_item, categories=categories, user=user)
 
 
@@ -338,7 +338,7 @@ def logout():
     if login_session['provider'] == 'github':
         return redirect(url_for('ghubdisconnect'))
 
-GOOGLEID = json.loads(open('/var/www/FlaskApp/FlaskApp/client_secret.json', 'r').read())['web']['client_id']
+GOOGLEID = json.loads(open('/var/www/CatalogApp/CatalogApp/client_secret.json', 'r').read())['web']['client_id']
 @app.route('/gconnect/', methods=['POST'])
 def gconnect():
     """
@@ -362,7 +362,7 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('/var/www/FlaskApp/FlaskApp/client_secret.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/var/www/CatalogApp/CatalogApp/client_secret.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(request.data)
     except FlowExchangeError:
@@ -459,8 +459,8 @@ def gdisconnect():
     return redirect(url_for('catalog'))
 
 
-FBID = json.loads(open('/var/www/FlaskApp/FlaskApp/fbclient_secret.json', 'r').read())['web']['app_id']
-FBSCRT = json.loads(open('/var/www/FlaskApp/FlaskApp/fbclient_secret.json', 'r').read())['web']['app_secret']
+FBID = json.loads(open('/var/www/CatalogApp/CatalogApp/fbclient_secret.json', 'r').read())['web']['app_id']
+FBSCRT = json.loads(open('/var/www/CatalogApp/CatalogApp/fbclient_secret.json', 'r').read())['web']['app_secret']
 @app.route('/fbconnect/', methods=['POST'])
 def fbconnect():
     """
@@ -556,8 +556,8 @@ def fbdisconnect():
     return redirect(url_for('catalog'))
 
 
-GHID = json.loads(open('/var/www/FlaskApp/FlaskApp/ghubclient_secret.json', 'r').read())['web']['app_id']
-GHSCRT = json.loads(open('/var/www/FlaskApp/FlaskApp/ghubclient_secret.json', 'r').read())['web']['app_secret']
+GHID = json.loads(open('/var/www/CatalogApp/CatalogApp/ghubclient_secret.json', 'r').read())['web']['app_id']
+GHSCRT = json.loads(open('/var/www/CatalogApp/CatalogApp/ghubclient_secret.json', 'r').read())['web']['app_secret']
 @app.route('/ghubconnect/', methods=['GET'])
 def ghubconnect():
     """

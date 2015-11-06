@@ -34,4 +34,7 @@ sudo service ssh restart
 
 echo "ssh port set to 2200, and root has been locked out
 verify you can login as grader or chad and that you have
-sudo power before closing this session."
+sudo power before closing this session.
+open a new shell and connect with:
+ssh -i ~/.ssh/udacity_key.rsa chad@52.26.180.232 -p 2200
+ssh -i ~/.ssh/udacity_key.rsa grader@52.26.180.232 -p 2200"

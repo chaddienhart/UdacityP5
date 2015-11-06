@@ -30,7 +30,10 @@ sudo cp ./catalogapp.wsgi /var/www/CatalogApp/catalogapp.wsgi
 #restart apache2
 sudo service apache2 restart 
 
-echo "Reload the page and you should now see 
+#these files and steps are from
+# https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
+
+echo "Reload the web page and you should now see 
     - Hello, I love Digital Ocean! -"
 
 

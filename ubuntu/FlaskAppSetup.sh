@@ -16,6 +16,7 @@ sudo pip install Flask
 sudo pip install cloudinary
 sudo pip install dict2xml
 sudo pip install oauth2client
+sudo apt-get install -y python-sqlalchemy
 deactivate
 
 sudo cd $curDir

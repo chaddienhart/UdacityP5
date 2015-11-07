@@ -24,12 +24,10 @@ sudo apt-get install -y libapache2-mod-wsgi python-dev
 sudo apt-get install -y python-psycopg2
 sudo apt-get install -y libpq-dev
 sudo apt-get install -y ntp
-# required for project 3
-sudo apt-get install -y python-sqlalchemy
 sudo apt-get install -y python-pip
 sudo pip install virtualenv
-sudo pip install Flask 
 # system monitoring and maintenance
+sudo apt-get install -y unattended-upgrades
 sudo apt-get install -y apachetop
 sudo apt-get install -y goaccess
 sudo apt-get install -y fail2ban
@@ -77,8 +75,26 @@ echo"Next run FlaskAppSetup.sh"
 sh ./FlaskAppSetup.sh
 
 # copy over the source from this repository
+echo "Copy the web app from this repository to the Flask application location."
 sudo cp -r ../* /var/www/CatalogApp/CatalogApp/
+echo
 
 # setup Nagios site monitoring
+echo "Setup Nagios to monitor the site and database."
 sh ./NagiosSetup.sh
+echo
+echo
+echo "
+Setup of the PostgreSQL database is not fully scripted yet. 
+You can load the database from this repository as follows:
+    sudo cp ./ubuntu/mycatalog /var/lib/postgresql
+    sudo -u postgres -i
+    psql -f mycatalog postgres
+    exit
+restart apache2 and reload the page.
+    sudo service apache2 restart 
+You should now see the Item Catalog app.
+"
+
+
 

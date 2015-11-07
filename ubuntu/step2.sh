@@ -25,7 +25,6 @@ sudo apt-get install -y python-psycopg2
 sudo apt-get install -y libpq-dev
 sudo apt-get install -y ntp
 # required for project 3
-sudo apt-get install -y git-all
 sudo apt-get install -y python-sqlalchemy
 sudo apt-get install -y python-pip
 sudo pip install virtualenv
@@ -34,8 +33,6 @@ sudo pip install Flask
 sudo apt-get install -y apachetop
 sudo apt-get install -y goaccess
 sudo apt-get install -y fail2ban
-sudo apt-get install -y sendmail
-sudo apt-get install -y ssmtp
 sudo apt-get install -y nagios3 nagios-nrpe-plugin
 sudo apt-get install -y nagios-nrpe-server nagios-plugins
 
@@ -77,4 +74,6 @@ sudo cp ./jail.local /etc/fail2ban/jail.local
 sudo service fail2ban restart
 
 echo"Next run FlaskAppSetup.sh"
+sh ./FlaskAppSetup.sh
+
 

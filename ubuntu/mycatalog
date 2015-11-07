@@ -1,0 +1,485 @@
+--
+-- PostgreSQL database cluster dump
+--
+
+SET default_transaction_read_only = off;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+
+--
+-- Roles
+--
+
+CREATE ROLE catalog;
+ALTER ROLE catalog WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION PASSWORD 'md56be3d84fa45e3612e5d22f1015b288af';
+CREATE ROLE nagios;
+ALTER ROLE nagios WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION PASSWORD 'md595add50e57241c249f694e8700044aaa';
+CREATE ROLE postgres;
+ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION PASSWORD 'md50b8bbc70b787ea3bfbc4c0ede828276c';
+CREATE ROLE template1;
+ALTER ROLE template1 WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION PASSWORD 'md5cd04b6af548f590dc35435403e9568bb';
+
+
+
+
+
+
+--
+-- Database creation
+--
+
+CREATE DATABASE catalog WITH TEMPLATE = template0 OWNER = postgres;
+REVOKE ALL ON DATABASE template1 FROM PUBLIC;
+REVOKE ALL ON DATABASE template1 FROM postgres;
+GRANT ALL ON DATABASE template1 TO postgres;
+GRANT CONNECT ON DATABASE template1 TO PUBLIC;
+
+
+\connect catalog
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: categories; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE categories (
+    id integer NOT NULL,
+    name character varying(250) NOT NULL
+);
+
+
+ALTER TABLE public.categories OWNER TO postgres;
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE categories_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.categories_id_seq OWNER TO postgres;
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE categories_id_seq OWNED BY categories.id;
+
+
+--
+-- Name: items; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE items (
+    name character varying(80) NOT NULL,
+    id integer NOT NULL,
+    description character varying(250),
+    picture character varying(250),
+    category_id integer,
+    user_id integer
+);
+
+
+ALTER TABLE public.items OWNER TO postgres;
+
+--
+-- Name: items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE items_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.items_id_seq OWNER TO postgres;
+
+--
+-- Name: items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE items_id_seq OWNED BY items.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE users (
+    name character varying(80) NOT NULL,
+    id integer NOT NULL,
+    email character varying(250),
+    picture character varying(250)
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_id_seq OWNED BY users.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY categories ALTER COLUMN id SET DEFAULT nextval('categories_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY items ALTER COLUMN id SET DEFAULT nextval('items_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Data for Name: categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY categories (id, name) FROM stdin;
+1	Flowers
+2	Fruit
+3	Herbs
+4	Vegetables
+\.
+
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('categories_id_seq', 4, true);
+
+
+--
+-- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY items (name, id, description, picture, category_id, user_id) FROM stdin;
+Tulips	1	Early spring flower in a wide variety of colors.	http://res.cloudinary.com/hi/image/upload/v1446007269/jbx3bt1a97aqu2dosnx2.jpg	1	2
+honey crisp apples	2	A great blend of sweet and tart, so delicious.	http://res.cloudinary.com/hi/image/upload/v1446531435/mz19cz083p9gjk99vzpp.jpg	2	2
+White peach	3	Sweeter than yellow peaches, great for making jam.	http://res.cloudinary.com/hi/image/upload/v1446531510/f0anzyzubqc3qwspmu3z.jpg	2	2
+Gravenstein Apple	4	Great for making apple pie.	http://res.cloudinary.com/hi/image/upload/v1446531548/hocssf1owg8q6vjzbdng.jpg	2	2
+Basil	5	Great for making pesto	http://res.cloudinary.com/hi/image/upload/v1446531578/ywjc0mpxrhtceenyxxnd.jpg	3	2
+cilantro	6	Always good in salsa, a little goes a long way...	http://res.cloudinary.com/hi/image/upload/v1446531678/zpyqakw3xlv4wsbqkepz.jpg	3	2
+zucchini	7	Large green squash, best for making sweet bread and sharing with friends.	http://res.cloudinary.com/hi/image/upload/v1446531742/snsgl3m2cvvozqtculpc.jpg	4	2
+Carrots	8	Loaded with beta carotene.	http://res.cloudinary.com/hi/image/upload/v1446531836/l6c9kwtbzxb8ezanub0q.jpg	4	2
+\.
+
+
+--
+-- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('items_id_seq', 8, true);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users (name, id, email, picture) FROM stdin;
+chad dienhart	1	chaddienhart@gmail.com	https://lh6.googleusercontent.com/-t3i3w0RMAW8/AAAAAAAAAAI/AAAAAAAAFOQ/iH2hsChWjCQ/photo.jpg
+Chad Dienhart	2	cdien@sbcglobal.net	https://scontent.xx.fbcdn.net/hprofile-xaf1/v/t1.0-1/c33.0.200.200/p200x200/41285_153651684649679_3546326_n.jpg?oh=df382a88c2ae054ed3187a10245b7889&oe=56C23046
+\.
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_id_seq', 2, true);
+
+
+--
+-- Name: categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY categories
+    ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY items
+    ADD CONSTRAINT items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: items_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY items
+    ADD CONSTRAINT items_category_id_fkey FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE;
+
+
+--
+-- Name: items_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY items
+    ADD CONSTRAINT items_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO catalog;
+
+
+--
+-- Name: categories; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE categories FROM PUBLIC;
+REVOKE ALL ON TABLE categories FROM postgres;
+GRANT ALL ON TABLE categories TO postgres;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE categories TO catalog;
+
+
+--
+-- Name: categories_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE categories_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE categories_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE categories_id_seq TO postgres;
+GRANT SELECT,USAGE ON SEQUENCE categories_id_seq TO catalog;
+
+
+--
+-- Name: items; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE items FROM PUBLIC;
+REVOKE ALL ON TABLE items FROM postgres;
+GRANT ALL ON TABLE items TO postgres;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE items TO catalog;
+
+
+--
+-- Name: items_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE items_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE items_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE items_id_seq TO postgres;
+GRANT SELECT,USAGE ON SEQUENCE items_id_seq TO catalog;
+
+
+--
+-- Name: users; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE users FROM PUBLIC;
+REVOKE ALL ON TABLE users FROM postgres;
+GRANT ALL ON TABLE users TO postgres;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO catalog;
+
+
+--
+-- Name: users_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE users_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE users_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE users_id_seq TO postgres;
+GRANT SELECT,USAGE ON SEQUENCE users_id_seq TO catalog;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect postgres
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: postgres; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+GRANT ALL ON SCHEMA public TO catalog;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect template1
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: template1; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE template1 IS 'default template for new databases';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+--
+-- PostgreSQL database cluster dump complete
+--
+

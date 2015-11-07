@@ -76,4 +76,9 @@ sudo service fail2ban restart
 echo"Next run FlaskAppSetup.sh"
 sh ./FlaskAppSetup.sh
 
+# copy over the source from this repository
+sudo cp -r ../* /var/www/CatalogApp/CatalogApp/
+
+# setup Nagios site monitoring
+sh ./NagiosSetup.sh
 

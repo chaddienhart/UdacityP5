@@ -1,21 +1,23 @@
 ### Udacity Full Stack Web Developer
 # Project 5 - Linux server configuration
 This project details setting up a web app using Linux, Apache2, PostgreSQL, and Flask<br>
-You can see this web app running at http://52.26.180.232/catalog/<br>
+You can see this web app running at http://52.32.84.113/catalog/<br>
 This work was done on a Ubuntu server started by Udacity (actually a EC2 Ubuntu instance).<br>
 See: https://github.com/chaddienhart/UdacityP3_ItemCatalog/blob/master/README.md <br>
   for details on the contents of the web app itself.
 #Getting started
 Although it was not required in this project I have written scripts to preform the major tasks of configuing my Linux server. So to use this repository to setup a server, get your Ubuntu 14.04 server running and log in as 'root' using ssh and your private key<br>
 First to get this repository you will need to install git<br>
-```  sudo apt-get install -y git-all ```<br>
+```  sudo apt-get install git-all ```<br>
 Then clone the repository and run step1.sh<br>
 ```
+cd /
 git clone https://github.com/chaddienhart/UdacityP5.git
 cd ./UdcityP5/ubuntu
 sudo chmod 744 step1.sh
 sudo ./step1.sh
 ```
+At the Package configuration prompt, select "keep the local version currently installed"<br>
 Follow the prompts, when done you will have your own version of this project running.
 ##What the setup scripts are doing
 ###Update the server

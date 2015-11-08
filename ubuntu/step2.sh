@@ -88,7 +88,7 @@ echo
 echo "
 Setup of the PostgreSQL database is not fully scripted yet. 
 You can load the database from this repository as follows:
-    sudo cp ./ubuntu/mycatalog /var/lib/postgresql
+    sudo cp mycatalog /var/lib/postgresql/
     sudo -u postgres -i
     psql -f mycatalog postgres
     exit

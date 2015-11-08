@@ -19,7 +19,9 @@ sudo pip install oauth2client
 sudo apt-get install -y python-sqlalchemy
 deactivate
 
-sudo cd $curDir
+cd $curDir
+echo
+echo "the current directory is $curDir"
 sudo cp ./__init__step1.py /var/www/CatalogApp/CatalogApp/__init__.py
 sudo cp ./CatalogApp.conf /etc/apache2/sites-available/CatalogApp.conf
 
@@ -33,8 +35,13 @@ sudo service apache2 restart
 
 #these files and steps are from
 # https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
-
+echo
+echo "******************************************"
+echo "You will need to edit /etc/apache2/sites-available/CatalogApp.conf
+and update the server address."
+echo "restart apache2 when you are done."
 echo "Reload the web page and you should now see 
     - Hello, I love Digital Ocean! -"
+read
 
 

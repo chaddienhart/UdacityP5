@@ -150,13 +150,16 @@ Fail2ban will lockout ip addresses that have more than three failed login attemp
 Some setup was needed to switch fail2ban to monitor SSH on port 2200, I followed the steps referenced here:<br> https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-12-04
 ###Set up Nagios to monitor server status
 I chose Nagios3 to monitor my server because there is a package that installs it and it has the ability to monitor my PostgreSQL database with a built in plugin (only minor configuration needed). Also user 'skh' seemed to have had success using it for this purpose.<br>
+You can access Nagios monitoring at: http://52.32.84.113/nagios3/ <br>
+Username: ```nagiosadmin```<br>
+Password: ```udacity2Grade```<br>
 To get nagios3 configured to run, modify the user to be in www-data group and make it executable:<br>
 ```
 sudo usermod -a -G nagios www-data
 sudo chmod -R +x /var/lib/nagios3/    
 ```
 In /etc/nagios3/nagios.cfg set ```check_external_commands=1```<br>
-Now you can login to http://<your site>/nagios3 using the nagiosadmin user and password you set. Notice the SSH server will not be responding because we need to reconfigure nagios to monitor SSH on port 2200. Configure this by editing /etc/nagios3/conf.d/services_nagios2.cfg, find the ssh-servers service definition and change it to:<br>
+Now you can login to http://your_site/nagios3 using the nagiosadmin user and password you set. Notice the SSH server will not be responding because we need to reconfigure nagios to monitor SSH on port 2200. Configure this by editing /etc/nagios3/conf.d/services_nagios2.cfg, find the ssh-servers service definition and change it to:<br>
 ```
     # check that ssh services are running
     define service {
@@ -191,7 +194,7 @@ Restart nagios<br>
 sudo service nagios-nrpe-server restart            
 sudo service nagios3 restart
 ```
-You should now see all seven services running with a status of 'OK' under http://<your site>/nagios3/ and click the 'Host groups' link on the left panel and then click on one of the 'localhost' links.<br>
+You should now see all seven services running with a status of 'OK' under http://your_site/nagios3/ and click the 'Host groups' link on the left panel and then click on one of the 'localhost' links.<br>
 To see it working try stopping the PosgreSQL server, ```sudo /etc/init.d/postgresql stop``` and wait a couple of minutes and nagios will report the 'check_pgsql' service as 'CRITICAL'. Correct this problem by restarting PostgreSQL ```sudo /etc/init.d/postgresql start```
 References:
 <br>https://www.howtoforge.com/nagios-on-ubuntu-14.04-trusty-tahr-and-debian-7-wheezy

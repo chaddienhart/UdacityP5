@@ -11,13 +11,16 @@
 #make the other scripts executable
 sudo chmod 744 step2.sh
 sudo chmod 744 FlaskAppSetup.sh
+sudo chmod 744 NagiosSetup.sh
 
 echo "Update ubuntu packages."
 sudo apt-get -y update
 sudo apt-get -y upgrade
+echo "Done updating ubuntu packages."
 
 echo
-ehco "Add new user 'grader' and set ssh up access"
+echo "Add new user 'grader' and set ssh up access"
+echo "No need to enter a password since we are not allowing passwords on this system."
 sudo adduser grader
 
 touch /etc/sudoers.d/grader
@@ -37,9 +40,9 @@ sudo cp ./sshd_config /etc/ssh/sshd_config
 sudo service ssh restart
 
 echo "ssh port set to 2200, and root has been locked out
-verify you can login as grader or chad and that you have
+verify you can login as grader and that you have
 sudo power before closing this session.
 open a new shell and connect with:
-ssh -i ~/.ssh/udacity_key.rsa grader@52.26.180.232 -p 2200
+ssh -i ~/.ssh/udacity_key.rsa grader@<your ip address> -p 2200
 
 then run step2.sh from the new 'grader' shell and close this one"

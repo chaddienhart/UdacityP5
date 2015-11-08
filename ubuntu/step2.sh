@@ -77,6 +77,7 @@ sh ./FlaskAppSetup.sh
 # copy over the source from this repository
 echo "Copy the web app from this repository to the Flask application location."
 sudo cp -r ../* /var/www/CatalogApp/CatalogApp/
+sudo service apache2 restart
 echo
 
 # setup Nagios site monitoring

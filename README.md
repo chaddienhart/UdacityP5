@@ -4,12 +4,12 @@ This project details setting up a web app using Linux, Apache2, PostgreSQL, and 
 You can see this web app running at http://52.26.180.232/catalog/<br>
 This work was done on a Ubuntu server started by Udacity (actually a EC2 Ubuntu instance).<br>
 See: https://github.com/chaddienhart/UdacityP3_ItemCatalog/blob/master/README.md <br>
-  for details on the contents of the web app
+  for details on the contents of the web app itself.
 #Getting started
 Although it was not required in this project I have written scripts to preform the major tasks of configuing my Linux server. So to use this repository to setup a server, get your Ubuntu 14.04 server running and log in as 'root' using ssh and your private key<br>
-To bring down this source you need to first install git<br>
+First to get this repository you will need to install git<br>
 ```  sudo apt-get install -y git-all ```<br>
-Bring down the repository and run step1.sh<br>
+Then clone the repository and run step1.sh<br>
 ```
 git clone https://github.com/chaddienhart/UdacityP5.git
 cd ./UdcityP5/ubuntu
@@ -63,9 +63,9 @@ unattended-upgrades
 ###Make sure your server has the right time and gets automatic package updates
 Setup NTP, Network Time Protocol, by stopping the service forcing the time to update and then restarting. see http://askubuntu.com/questions/254826/how-to-force-a-clock-update-using-ntp
 <br>
-Setup automatic updates with the unattended-upgrades package see http://askubuntu.com/questions/9/how-do-i-enable-automatic-updates
+Setup automatic updates with the unattended-upgrades package see<br> http://askubuntu.com/questions/9/how-do-i-enable-automatic-updates <br>
 Turn on security updates with ```sudo dpkg-reconfigure --priority=low unattended-upgrades```<br>
-Turn on 50 unattended updates by editing /etc/apt/apt.conf.d/50unattended-upgrades and uncommenting this line (line 4):<br>
+Turn on 50 unattended updates by editing ```/etc/apt/apt.conf.d/50unattended-upgrades``` and uncommenting this line:<br>
 ```${distro_id} ${distro_codename}-updates";```
 ###Setup Apache2 to host a Flask web app
 Create the following directory sturcture:
@@ -82,11 +82,12 @@ dict2xml
 oauth2client
 python-sqlalchemy
 ```
-Configure the virtual host by updating /etc/apache2/sites-available/CatalogApp.conf<br>
+Configure the virtual host by updating ```/etc/apache2/sites-available/CatalogApp.conf```<br>
 Configure the WSGI ```/var/www/CatalogApp/catalogapp.wsgi``` and enable the app with ```sudo a2ensite CatalogApp```<br>
 Note: make sure you add ```Options -Indexes``` to the WSGI to disallow directory listing.<br>
-Initially we will create a basic /var/www/CatalogApp/CatalogApp/__init__.py to make sure things are working before proceeding.<br>
-Restart apache2 and you should see "Hello, I love Digital Ocean!" when browsing to the app now.
+Initially we will create a basic ```/var/www/CatalogApp/CatalogApp/__init__.py``` <br>
+Test to make sure things are working before proceeding.<br>
+Restart apache2 (```sudo service apache2 restart```) and you should see "Hello, I love Digital Ocean!" when browsing to the app now.
 <br>reference: https://www.digitalocean.com/community/tutorials/how-to-deploy-a-flask-application-on-an-ubuntu-vps
 ###Configure the PostgreSQL database
 The scripted version will simply recall the PostgreSQL database that was setup originally using:<br>
@@ -96,8 +97,8 @@ The scripted version will simply recall the PostgreSQL database that was setup o
     psql -f mycatalog postgres
     exit
 ```
-Here are the steps taken to setup that database.<br>
-####Add and configure role 'catalog', don't forget to set the password
+#####Here are the steps taken to setup that database.<br>
+Add and configure role 'catalog', don't forget to set the password<br>
 Note: I had trouble connecting to the database until I set the password for 'catalog'
 ```
 sudo -u postgres -i
@@ -108,7 +109,7 @@ GRANT ALL ON SCHEMA public TO catalog;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to catalog;
 \q
 ```
-####Setup the database tables and populate catagories
+Setup the database tables and populate catagories
 ```
  sudo -u postgres -i
  cd /var/www/CatalogApp/CatalogApp/ubuntu
@@ -143,13 +144,61 @@ References:
 <br>https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04
 <br>https://www.digitalocean.com/community/tutorials/how-to-secure-postgresql-on-an-ubuntu-vps
 ###Set up Fail2ban to protect against attack
-Fail2ban will lockout ip addresses that have more than three failed login attemps. Currently the lock out is only 10 minutes but that can be increased by editing /etc/fail2ban/jail.local.<br>
-Some setup was needed to switch fail2ban to monitor SSH on port 2200, referenced https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-12-04
+Fail2ban will lockout ip addresses that have more than three failed login attemps. Currently the lock out is only 10 minutes but that can be increased by editing ```/etc/fail2ban/jail.local```<br>
+Some setup was needed to switch fail2ban to monitor SSH on port 2200, I followed the steps referenced here:<br> https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-12-04
 ###Set up Nagios to monitor server status
-I chose Nagios3 to monitor my server because there is a package that installs it and it has the ability to monitor my PostgreSQL database with a built in plugin (only minor configuration needed). Also user 'skh' seemed to have had success using it for this purpose.
-Reference:
+I chose Nagios3 to monitor my server because there is a package that installs it and it has the ability to monitor my PostgreSQL database with a built in plugin (only minor configuration needed). Also user 'skh' seemed to have had success using it for this purpose.<br>
+To get nagios3 configured to run, modify the user to be in www-data group and make it executable:<br>
+```
+sudo usermod -a -G nagios www-data
+sudo chmod -R +x /var/lib/nagios3/    
+```
+In /etc/nagios3/nagios.cfg set ```check_external_commands=1```<br>
+Now you can login to http://<your site>/nagios3 using the nagiosadmin user and password you set. Notice the SSH server will not be responding because we need to reconfigure nagios to monitor SSH on port 2200. Configure this by editing /etc/nagios3/conf.d/services_nagios2.cfg, find the ssh-servers service definition and change it to:<br>
+```
+    # check that ssh services are running
+    define service {
+            hostgroup_name                  ssh-servers
+            service_description             SSH
+            check_command                   check_ssh_port!2200
+```
+To setup PostgreSQL monitoring, add the following to /etc/nagios-plugins/config/pgsql.cfg<br>
+```
+    define command{
+            command_name    check_pgsql_cat
+            command_line    /usr/lib/nagios/plugins/check_pgsql -d catalog -H 127.0.0.1 -l 'catalog' -p 'catalog'
+```
+Add the following to /etc/nagios3/conf.d/postgre_nagios2.cfg (note you will have to create this file)<br>
+```
+    define service{
+            hostgroup_name                  postgresql-servers
+            service_description             check_pgsql
+            check_command                   check_pgsql_cat
+            use                             generic-service
+    }
+```
+Finally add the following to /etc/nagios3/conf.d/hostgroups_nagios2.cfg<br>
+```
+define hostgroup {
+        hostgroup_name postgresql-servers
+                members         localhost
+        }
+```
+Restart nagios<br>
+```
+sudo service nagios-nrpe-server restart            
+sudo service nagios3 restart
+```
+You should now see all seven services running with a status of 'OK' under http://<your site>/nagios3/ and click the 'Host groups' link on the left panel and then click on one of the 'localhost' links.<br>
+To see it working try stopping the PosgreSQL server, ```sudo /etc/init.d/postgresql stop``` and wait a couple of minutes and nagios will report the 'check_pgsql' service as 'CRITICAL'. Correct this problem by restarting PostgreSQL ```sudo /etc/init.d/postgresql start```
+References:
 <br>https://www.howtoforge.com/nagios-on-ubuntu-14.04-trusty-tahr-and-debian-7-wheezy
+<br>https://viewsby.wordpress.com/2012/07/10/nagios-change-ssh-port/
 ###Other setup required
+I had to change a few of the SQLalchemy calls to group_by, just returning all is acceptable for my database because the categories are not user configurable so there should not be duplicates. See https://discussions.udacity.com/t/sqlalchemy-error-using-postgresql-works-under-sqlite/33200 <br>
+I encountered a problem with the count() in the templates/catalog.html
+and had to change ```{% for c in range(0, categories.count()) %}``` to ```{% for c in categories %}``` <br>
+I had to fully specify the client secret files used for OAuth2. <br>
 You will need to update your OAuth2 providers. This project uses Google, Facebook, and GitHub.<br>
 <br>This repository was created from UdacityP3_ItemCatalog, proj5 branch using:<br>
 ```  \GitHub\UdacityP3_ItemCatalog [proj5]> git push https://github.com/chaddienhart/UdacityP5.git +proj5:master```

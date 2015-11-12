@@ -9,16 +9,18 @@ See: https://github.com/chaddienhart/UdacityP3_ItemCatalog/blob/master/README.md
 Although it was not required in this project I have written scripts to preform the major tasks of configuing my Linux server. So to use this repository to setup a server, get your Ubuntu 14.04 server running and log in as 'root' using ssh and your private key<br>
 First to get this repository you will need to install git<br>
 ```  sudo apt-get install git-all ```<br>
+```  sudo apt-get install git ``` (EC2)<br>
 Then clone the repository and run step1.sh<br>
 ```
 cd /
-git clone https://github.com/chaddienhart/UdacityP5.git
+sudo git clone https://github.com/chaddienhart/UdacityP5.git
 cd ./UdcityP5/ubuntu
 sudo chmod 744 step1.sh
 sudo ./step1.sh
 ```
 At the Package configuration prompt, select "keep the local version currently installed"<br>
-Follow the prompts, when done you will have your own version of this project running.
+Follow the prompts, when done you will have your own version of this project running.<br>
+When asked for a password for grader you can simply enter blank as passwords will be disable.<br>
 ##What the setup scripts are doing
 ###Update the server
 The first thing to do when bringing up a Ubuntu server is to update packages. This is done by issuing the following two commands:<br>

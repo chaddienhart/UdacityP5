@@ -1,8 +1,7 @@
 ### Udacity Full Stack Web Developer
 # Project 5 - Linux server configuration
 This project details setting up a web app using Linux, Apache2, PostgreSQL, and Flask<br>
-You can see this web app running at http://52.32.84.113/catalog/<br>
-This work was done on a Ubuntu server started by Udacity (actually a EC2 Ubuntu instance).<br>
+You can see this web app running at http://54.183.181.211/catalog/ on an EC2 Ubuntu instance.<br>
 See: https://github.com/chaddienhart/UdacityP3_ItemCatalog/blob/master/README.md <br>
   for details on the contents of the web app itself.
 #Getting started
@@ -21,6 +20,14 @@ sudo ./step1.sh
 At the Package configuration prompt, select "keep the local version currently installed"<br>
 Follow the prompts, when done you will have your own version of this project running.<br>
 When asked for a password for grader you can simply enter blank as passwords will be disable.<br>
+After the scripts have completed you will need to update the IP address in /etc/apache2/sites-available/CatalogApp.conf and update the PostgreSQL database (steps at the end of step2.sh)<br>
+```
+sudo cp mycatalog /var/lib/postgresql/
+sudo -u postgres -i
+psql -f mycatalog postgres
+exit
+sudo service apache2 restart
+```
 ##What the setup scripts are doing
 ###Update the server
 The first thing to do when bringing up a Ubuntu server is to update packages. This is done by issuing the following two commands:<br>
